@@ -62,7 +62,13 @@ hr {
   flex-direction: column;
   align-items: center;
 
-  width: 40rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+
+  padding-bottom: 5rem;
 
   gap: 0.5rem;
 }
@@ -104,6 +110,13 @@ hr {
 
 .song-progress {
   width: 50%;
+}
+
+.time {
+  width: 6ch;
+
+  text-align: center;
+  font-weight: 500;
 }
 
 .controls {

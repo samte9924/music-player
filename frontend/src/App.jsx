@@ -6,6 +6,7 @@ import {
   SkipBack,
   SkipForward,
   Volume2,
+  VolumeOff,
 } from "lucide-react";
 import "./App.css";
 
@@ -15,13 +16,13 @@ function App() {
   const [error, setError] = useState(null);
 
   const [currentSong, setCurrentSong] = useState(null);
-  const [currentTime, setCurrentTime] = useState("0:00");
-  const [duration, setDuration] = useState("0:00");
+  const [currentTime, setCurrentTime] = useState("--:--");
+  const [duration, setDuration] = useState("--:--");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
   const [sliderMax, setSliderMax] = useState(100);
   const [bufferedAmount, setBufferedAmount] = useState(100);
-  const [seekableAmount, setSeekableAmount] = useState(100);
-
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const songRef = useRef(null);
 
@@ -91,7 +92,6 @@ function App() {
   };
 
   const handleCanPlay = () => {
-    console.log("can play");
     setIsPlaying(true);
     songRef.current
       .play()
@@ -99,10 +99,10 @@ function App() {
   };
 
   const handlePause = () => {
-    setIsPlaying((prev) => !prev);
     const song = songRef.current;
 
     if (song && currentSong) {
+      setIsPlaying((prev) => !prev);
       if (!isPlaying && song.paused) {
         song.play().catch((err) => console.error("Playback failed: ", err));
       } else {
@@ -114,6 +114,19 @@ function App() {
   const restartSong = () => {
     if (songRef.current) {
       songRef.current.currentTime = 0;
+    }
+  };
+
+  const handleMute = () => {
+    const song = songRef.current;
+
+    if (song && currentSong) {
+      setIsMuted((prev) => !prev);
+      if (!isMuted && song.volume > 0) {
+        song.volume = 0;
+      } else {
+        song.volume = 1;
+      }
     }
   };
 
@@ -165,8 +178,12 @@ function App() {
             className="song-progress"
           />
           <span className="duration time">{duration}</span>
-          <button disabled={!currentSong}>
-            <Volume2 className="icon" />
+          <button onClick={handleMute} disabled={!currentSong}>
+            {isMuted ? (
+              <VolumeOff className="icon" />
+            ) : (
+              <Volume2 className="icon" />
+            )}
           </button>
         </div>
         <div className="controls">

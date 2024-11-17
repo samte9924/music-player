@@ -20,6 +20,13 @@ server.get("/api/songs", (req, res) => {
   const songsPath = path.join(__dirname, "data", "songs");
   console.log(songsPath);
 
+  // If songs folder not found, create it
+  if (!fs.existsSync(songsPath)) {
+    fs.mkdirSync(songsPath, { recursive: true });
+    console.log(`Folder created: ${songsPath}`);
+  }
+
+  // Read songs inside folder
   fs.readdir(songsPath, (err, files) => {
     if (err) {
       console.log(err);

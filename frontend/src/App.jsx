@@ -109,7 +109,6 @@ function App() {
             <RotateCw className="icon" />
           </button>
           <span className="current-time time">{currentTime}</span>
-          {/* To-do: make custom slider with buffer color */}
           <input
             type="range"
             max={sliderMax}

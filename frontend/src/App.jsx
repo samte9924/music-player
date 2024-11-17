@@ -13,6 +13,8 @@ function App() {
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [currentSong, setCurrentSong] = useState(null);
   const [currentTime, setCurrentTime] = useState("0:00");
   const [duration, setDuration] = useState("0:00");
   const [sliderMax, setSliderMax] = useState(100);
@@ -46,17 +48,17 @@ function App() {
     fetchSongs();
   }, []);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const song = songRef.current;
 
-    if (song) {
-      if (isPlaying && song.paused) {
+    if (song && currentSong) {
+      if (!isPlaying && song.paused) {
         song.play().catch((err) => console.error("Playback failed: ", err));
       } else {
         song.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentSong]); */
 
   const handleMetadataLoaded = () => {
     setDuration(calculateTime(songRef.current.duration));
@@ -84,6 +86,31 @@ function App() {
     return `${minutes}:${fixedSeconds}`;
   };
 
+  const handleSongChange = (newSong) => {
+    setCurrentSong(newSong);
+  };
+
+  const handleCanPlay = () => {
+    console.log("can play");
+    setIsPlaying(true);
+    songRef.current
+      .play()
+      .catch((err) => console.error("Playback failed: ", err));
+  };
+
+  const handlePause = () => {
+    setIsPlaying((prev) => !prev);
+    const song = songRef.current;
+
+    if (song && currentSong) {
+      if (!isPlaying && song.paused) {
+        song.play().catch((err) => console.error("Playback failed: ", err));
+      } else {
+        song.pause();
+      }
+    }
+  };
+
   const restartSong = () => {
     if (songRef.current) {
       songRef.current.currentTime = 0;
@@ -99,7 +126,10 @@ function App() {
         {songs.map((song, index) => (
           <div key={index} title={song} className="song">
             <span>{song.length > 30 ? song.slice(0, 27) + "..." : song}</span>
-            <button className="select-song-button">
+            <button
+              onClick={() => handleSongChange(song)}
+              className="select-song-button"
+            >
               <Play size={24} />
             </button>
           </div>
@@ -107,9 +137,17 @@ function App() {
       </div>
       <hr />
       <div className="playing-song">
-        <span className="song-name">Now playing - Song 1</span>
+        <span className="song-name">
+          {currentSong
+            ? `Now playing - ${currentSong.replace(".mp4", "")}`
+            : "No song selected"}
+        </span>
         <div className="progress-container">
-          <button onClick={restartSong} className="restart-song-button">
+          <button
+            onClick={restartSong}
+            disabled={!currentSong}
+            className="restart-song-button"
+          >
             <RotateCw className="icon" />
           </button>
           <span className="current-time time">{currentTime}</span>
@@ -123,36 +161,38 @@ function App() {
               songRef.current.currentTime = updatedTime;
               setCurrentTime(calculateTime(updatedTime));
             }}
+            disabled={!currentSong}
             className="song-progress"
           />
           <span className="duration time">{duration}</span>
-          <button>
+          <button disabled={!currentSong}>
             <Volume2 className="icon" />
           </button>
         </div>
         <div className="controls">
-          <button className="skip-back-button">
+          <button disabled={!currentSong} className="skip-back-button">
             <SkipBack className="icon" />
           </button>
           <button
-            onClick={() => setIsPlaying((prev) => !prev)}
+            onClick={handlePause}
+            disabled={!currentSong}
             className="pause-button"
           >
-            <Pause className="icon" />
+            {isPlaying ? <Pause className="icon" /> : <Play className="icon" />}
           </button>
-          <button className="skip-forward-button">
+          <button disabled={!currentSong} className="skip-forward-button">
             <SkipForward className="icon" />
           </button>
         </div>
       </div>
-      <hr />
       <audio
         ref={songRef}
-        src={`http://localhost:3000/songs/Far Out - Origin.mp3`}
+        src={`http://localhost:3000/songs/${currentSong}`}
         preload="metadata"
         onLoadedMetadata={handleMetadataLoaded}
         onProgress={handleProgress}
         onTimeUpdate={handleTimeUpdate}
+        onCanPlay={handleCanPlay}
       ></audio>
     </>
   );

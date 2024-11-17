@@ -19,6 +19,8 @@ function App() {
   const [bufferedAmount, setBufferedAmount] = useState(100);
   const [seekableAmount, setSeekableAmount] = useState(100);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const songRef = useRef(null);
 
   useEffect(() => {
@@ -45,36 +47,33 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleMetadataLoaded = () => {
-      setDuration(calculateTime(song.duration));
-      setSliderMax(Math.floor(song.duration));
-    };
-
-    const handleProgress = () => {
-      if (song.buffered.length > 0) {
-        setBufferedAmount(song.buffered.end(song.buffered.length - 1));
-      }
-    };
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(calculateTime(song.currentTime));
-    };
-
     const song = songRef.current;
-    if (song) {
-      song.addEventListener("loadedmetadata", handleMetadataLoaded);
-      song.addEventListener("progress", handleProgress);
-      song.addEventListener("timeupdate", handleTimeUpdate);
-    }
 
-    return () => {
-      if (song) {
-        song.addEventListener("loadedmetadata", handleMetadataLoaded);
-        song.addEventListener("progress", handleProgress);
-        song.addEventListener("timeupdate", handleTimeUpdate);
+    if (song) {
+      if (isPlaying && song.paused) {
+        song.play().catch((err) => console.error("Playback failed: ", err));
+      } else {
+        song.pause();
       }
-    };
-  }, []);
+    }
+  }, [isPlaying]);
+
+  const handleMetadataLoaded = () => {
+    setDuration(calculateTime(songRef.current.duration));
+    setSliderMax(Math.floor(songRef.current.duration));
+  };
+
+  const handleProgress = () => {
+    if (songRef.current.buffered.length > 0) {
+      setBufferedAmount(
+        songRef.current.buffered.end(songRef.current.buffered.length - 1)
+      );
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    setCurrentTime(calculateTime(songRef.current.currentTime));
+  };
 
   const calculateTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -85,8 +84,13 @@ function App() {
     return `${minutes}:${fixedSeconds}`;
   };
 
-  if (error) return <div>{error}</div>;
+  const restartSong = () => {
+    if (songRef.current) {
+      songRef.current.currentTime = 0;
+    }
+  };
 
+  if (error) return <div>{error}</div>;
   if (isLoading) return <div>Loading</div>;
 
   return (
@@ -105,7 +109,7 @@ function App() {
       <div className="playing-song">
         <span className="song-name">Now playing - Song 1</span>
         <div className="progress-container">
-          <button className="restart-song-button">
+          <button onClick={restartSong} className="restart-song-button">
             <RotateCw className="icon" />
           </button>
           <span className="current-time time">{currentTime}</span>
@@ -115,6 +119,7 @@ function App() {
             value={Math.floor(songRef.current?.currentTime || 0)}
             onChange={(e) => {
               const updatedTime = e.target.value;
+              //console.log(updatedTime);
               songRef.current.currentTime = updatedTime;
               setCurrentTime(calculateTime(updatedTime));
             }}
@@ -129,7 +134,10 @@ function App() {
           <button className="skip-back-button">
             <SkipBack className="icon" />
           </button>
-          <button className="pause-button">
+          <button
+            onClick={() => setIsPlaying((prev) => !prev)}
+            className="pause-button"
+          >
             <Pause className="icon" />
           </button>
           <button className="skip-forward-button">
@@ -142,6 +150,9 @@ function App() {
         ref={songRef}
         src={`http://localhost:3000/songs/Far Out - Origin.mp3`}
         preload="metadata"
+        onLoadedMetadata={handleMetadataLoaded}
+        onProgress={handleProgress}
+        onTimeUpdate={handleTimeUpdate}
       ></audio>
     </>
   );

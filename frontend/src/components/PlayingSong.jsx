@@ -9,7 +9,7 @@ import {
   VolumeOff,
 } from "lucide-react";
 
-export default function PlayingSong({ currentSong }) {
+export default function PlayingSong({ currentSong, handleSongEnded }) {
   const [currentTime, setCurrentTime] = useState("--:--");
   const [duration, setDuration] = useState("--:--");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -99,7 +99,9 @@ export default function PlayingSong({ currentSong }) {
           >
             <RotateCw className="icon" />
           </button>
-          <span className="current-time time">{currentTime}</span>
+          <span className="current-time time">
+            {currentSong ? currentTime : "--:--"}
+          </span>
           <input
             type="range"
             max={sliderMax}
@@ -113,7 +115,9 @@ export default function PlayingSong({ currentSong }) {
             disabled={!currentSong}
             className="song-progress"
           />
-          <span className="duration time">{duration}</span>
+          <span className="duration time">
+            {currentSong ? duration : "--:--"}
+          </span>
           <button onClick={handleMute} disabled={!currentSong}>
             {isMuted ? (
               <VolumeOff className="icon" />
@@ -146,6 +150,7 @@ export default function PlayingSong({ currentSong }) {
         onProgress={handleProgress}
         onTimeUpdate={handleTimeUpdate}
         onCanPlay={handleCanPlay}
+        onEnded={handleSongEnded}
       ></audio>
     </>
   );

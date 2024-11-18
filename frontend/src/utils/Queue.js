@@ -8,23 +8,25 @@ export class Queue {
   }
 
   dequeue() {
+    if (this.isEmpty()) {
+      console.warn("Cannot dequeue: Queue is empty.");
+      return null;
+    }
+
     return this.songs.shift();
   }
 
   dequeueIndex(index) {
-    if (index <= 0) {
-      return this.dequeue();
-    }
-    if (index >= this.songs.length) {
+    if (index < 0 && index >= this.songs.length) {
       console.error(`Index out of bounds. Length: ${this.songs.length}`);
-      return;
+      return null;
     }
 
-    return this.songs.splice(index, 1)[0];
+    return index === 0 ? this.dequeue() : this.songs.splice(index, 1)[0];
   }
 
   peek() {
-    return this.songs[0];
+    return this.isEmpty() ? null : this.songs[0];
   }
 
   shuffle() {
@@ -39,13 +41,13 @@ export class Queue {
 
   display() {
     if (this.isEmpty()) {
-      console.log("Queue is empty");
+      console.warn("Queue is empty");
       return;
     }
 
     console.log("Current queue");
-    for (let i = 0; i < this.songs.length; i++) {
-      console.log(`${i + 1} | ${this.songs[i]}`);
-    }
+    this.songs.forEach((song, index) => {
+      console.log(`${index + 1} | ${song}`);
+    });
   }
 }

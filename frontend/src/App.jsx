@@ -3,7 +3,7 @@ import SongsList from "./components/SongsList";
 import PlayingSong from "./components/PlayingSong";
 import "./App.css";
 import { Queue } from "./utils/Queue";
-import { Minus } from "lucide-react";
+import { Minus, Shuffle } from "lucide-react";
 
 function App() {
   const [songs, setSongs] = useState([]);
@@ -41,6 +41,11 @@ function App() {
     setCurrentSong(newSong);
   };
 
+  const handleSongEnded = () => {
+    const nextSong = dequeue();
+    setCurrentSong(nextSong);
+  };
+
   const enqueue = (song) => {
     const updatedQueue = new Queue(queue.songs);
     updatedQueue.enqueue(song);
@@ -60,6 +65,12 @@ function App() {
     setQueue(updatedQueue);
   };
 
+  const shuffleQueue = () => {
+    const updatedQueue = new Queue(queue.songs);
+    updatedQueue.shuffle();
+    setQueue(updatedQueue);
+  };
+
   if (error) return <div>{error}</div>;
   if (isLoading) return <div>Loading</div>;
 
@@ -72,26 +83,42 @@ function App() {
       />
       <hr />
       <div className="queue">
-        <h2>Songs queue</h2>
-        {queue.songs.map((song, index) => (
-          <div key={index} className="song">
-            <span>
-              {song.length > 30
-                ? song.slice(0, 27) + "..."
-                : song.replace(".mp3", "")}
-            </span>
-            <button
-              title="Remove from queue"
-              onClick={() => dequeueIndex(index)}
-              className="remove-from-queue-button"
-            >
-              <Minus size={24} />
-            </button>
-          </div>
-        ))}
+        <div className="header">
+          <h2>Songs queue</h2>
+          <button
+            onClick={shuffleQueue}
+            className="suffle-button"
+            disabled={queue.songs.length === 0}
+          >
+            <Shuffle size={24} />
+          </button>
+        </div>
+        {queue.isEmpty() ? (
+          <i>Queue is empty</i>
+        ) : (
+          queue.songs.map((song, index) => (
+            <div key={index} className="song">
+              <span>
+                {song.length > 30
+                  ? song.slice(0, 27) + "..."
+                  : song.replace(".mp3", "")}
+              </span>
+              <button
+                title="Remove from queue"
+                onClick={() => dequeueIndex(index)}
+                className="remove-from-queue-button"
+              >
+                <Minus size={24} />
+              </button>
+            </div>
+          ))
+        )}
       </div>
       <hr />
-      <PlayingSong currentSong={currentSong} />
+      <PlayingSong
+        currentSong={currentSong}
+        handleSongEnded={handleSongEnded}
+      />
     </>
   );
 }

@@ -34,6 +34,7 @@ server.get("/api/songs", (req, res) => {
     }
 
     console.log(files);
+    // To-do: return song names without extension
     res.json({ songs: files });
   });
 });

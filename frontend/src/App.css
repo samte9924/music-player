@@ -1,3 +1,9 @@
+hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* SONGS LIST COMPONENT */
 .songs-container {
   display: flex;
   flex-direction: column;
@@ -6,16 +12,11 @@
   padding: 1rem;
 }
 
-hr {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
 .song {
   position: relative;
 
   height: 3rem;
-  width: calc(32ch + 1rem);
+  width: calc(32ch + 3rem);
 
   display: flex;
   align-items: center;
@@ -36,7 +37,15 @@ hr {
   width: 32ch;
 }
 
-.select-song-button {
+.actions-container {
+  display: flex;
+  align-items: center;
+
+  gap: 0.5rem;
+}
+
+.select-song-button,
+.add-to-queue-button {
   display: none;
   align-items: center;
   justify-content: center;
@@ -50,13 +59,46 @@ hr {
 
   cursor: pointer;
 }
-.song:hover .select-song-button {
+.song:hover .select-song-button,
+.song:hover .add-to-queue-button {
   display: flex;
 }
-.select-song-button:hover {
+.select-song-button:hover,
+.add-to-queue-button:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
+/* QUEUE COMPONENT */
+.queue {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 1rem;
+}
+
+.remove-from-queue-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  background: none;
+  border: none;
+  outline: none;
+  border-radius: 50%;
+
+  padding: 0.3rem;
+
+  cursor: pointer;
+}
+.song:hover .remove-from-queue-button {
+  display: flex;
+}
+.remove-from-queue-button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* PLAYING SONG COMPONENT */
 .playing-song {
   display: flex;
   flex-direction: column;

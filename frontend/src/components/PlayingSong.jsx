@@ -6,6 +6,7 @@ import {
   SkipBack,
   SkipForward,
   Star,
+  Volume1,
   Volume2,
   VolumeOff,
 } from "lucide-react";
@@ -104,11 +105,13 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
   return (
     <>
       <div className="playing-song">
-        <span className="song-name">
-          {currentSong
-            ? `${currentSong.replace(".mp3", "")}`
-            : "No song selected"}
-        </span>
+        <div className="song-name">
+          <span>
+            {currentSong
+              ? `${currentSong.replace(".mp3", "")}`
+              : "No song selected"}
+          </span>
+        </div>
         <div className="main-container">
           <div className="controls-container">
             <button
@@ -188,6 +191,8 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
           >
             {isMuted ? (
               <VolumeOff className="icon" />
+            ) : volume <= 0.5 ? (
+              <Volume1 className="icon" />
             ) : (
               <Volume2 className="icon" />
             )}

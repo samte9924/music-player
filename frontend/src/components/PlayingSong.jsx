@@ -6,6 +6,7 @@ import {
   SkipBack,
   SkipForward,
   Star,
+  Volume,
   Volume1,
   Volume2,
   VolumeOff,
@@ -31,6 +32,7 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
 
     return `${minutes}:${fixedSeconds}`;
   };
+
   const handleMetadataLoaded = () => {
     setDuration(calculateTime(songRef.current.duration));
     setSliderMax(Math.floor(songRef.current.duration));
@@ -49,10 +51,11 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
   };
 
   const handleCanPlay = () => {
-    setIsPlaying(true);
+    songRef.current.volume = volume;
     songRef.current
       .play()
       .catch((err) => console.error("Playback failed: ", err));
+    setIsPlaying(true);
   };
 
   const handlePause = () => {
@@ -75,11 +78,13 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
   };
 
   const handleVolumeChange = (e) => {
+    const song = songRef.current;
     const newVolume = parseFloat(e.target.value);
-    if (songRef.current && currentSong) {
-      songRef.current.volume = newVolume;
+    if (song && currentSong) {
+      if (!song.muted) {
+        song.volume = newVolume;
+      }
       setVolume(newVolume);
-      setIsMuted(newVolume === 0);
     }
   };
 
@@ -87,10 +92,9 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
     const song = songRef.current;
 
     if (song && currentSong) {
-      setIsMuted((prev) => !prev);
-      if (!isMuted && song.volume > 0) {
-        song.volume = 0;
-      } else {
+      song.muted = !song.muted;
+      setIsMuted(song.muted);
+      if (!song.muted) {
         song.volume = volume;
       }
     }
@@ -108,7 +112,11 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
         <div className="song-name">
           <span>
             {currentSong
-              ? `${currentSong.replace(".mp3", "")}`
+              ? `${
+                  currentSong.length > 33
+                    ? currentSong.slice(0, 30) + "..."
+                    : currentSong.replace(".mp3", "")
+                }`
               : "No song selected"}
           </span>
         </div>
@@ -191,6 +199,8 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
           >
             {isMuted ? (
               <VolumeOff className="icon" />
+            ) : volume === 0 ? (
+              <Volume className="icon" />
             ) : volume <= 0.5 ? (
               <Volume1 className="icon" />
             ) : (

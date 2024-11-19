@@ -3,12 +3,27 @@ import React from "react";
 
 export default function Queue({
   currentSong,
+  setCurrentSong,
   queue,
-  dequeueIndex,
-  playNowFromQueue,
-  clearQueue,
-  shuffleQueue,
+  setQueue,
 }) {
+  const dequeueIndex = (index) => {
+    setQueue((prevQueue) => prevQueue.filter((_, i) => i !== index));
+  };
+
+  const shuffleQueue = () => {
+    setQueue((prevQueue) => [...prevQueue].sort(() => Math.random() - 0.5));
+  };
+
+  const clearQueue = () => {
+    setQueue([]);
+  };
+
+  const playNowFromQueue = (index) => {
+    setQueue((prevQueue) => [...prevQueue].slice(index + 1));
+    setCurrentSong(queue[index]);
+  };
+
   return (
     <div className="queue">
       <div className="header">
@@ -33,7 +48,9 @@ export default function Queue({
         </div>
       </div>
       <h3>Listening to</h3>
-      <div className="current-song">{currentSong || "-"}</div>
+      <div className="song">
+        <span>{currentSong ? currentSong.replace(".mp3", "") : "-"}</span>
+      </div>
       <h3>Next up</h3>
       {queue.length === 0 ? (
         <i>Queue is empty</i>

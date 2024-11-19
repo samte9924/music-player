@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SongsList from "./components/SongsList";
 import PlayingSong from "./components/PlayingSong";
-import { Minus, Play, Shuffle, Trash2 } from "lucide-react";
 import "./App.css";
 import Queue from "./components/Queue";
 
@@ -59,23 +58,6 @@ function App() {
     return queue[0];
   };
 
-  const dequeueIndex = (index) => {
-    setQueue((prevQueue) => prevQueue.filter((_, i) => i !== index));
-  };
-
-  const shuffleQueue = () => {
-    setQueue((prevQueue) => [...prevQueue].sort(() => Math.random() - 0.5));
-  };
-
-  const clearQueue = () => {
-    setQueue([]);
-  };
-
-  const playNowFromQueue = (index) => {
-    setQueue((prevQueue) => [...prevQueue].slice(index + 1));
-    setCurrentSong(queue[index]);
-  };
-
   if (error) return <div>{error}</div>;
   if (isLoading) return <div>Loading</div>;
 
@@ -89,11 +71,9 @@ function App() {
       <hr />
       <Queue
         currentSong={currentSong}
+        setCurrentSong={setCurrentSong}
         queue={queue}
-        dequeueIndex={dequeueIndex}
-        playNowFromQueue={playNowFromQueue}
-        clearQueue={clearQueue}
-        shuffleQueue={shuffleQueue}
+        setQueue={setQueue}
       />
       <hr />
       <PlayingSong

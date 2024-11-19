@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SongsList from "./components/SongsList";
 import PlayingSong from "./components/PlayingSong";
+import { Minus, Play, Shuffle, Trash2 } from "lucide-react";
 import "./App.css";
-import { Queue } from "./utils/Queue";
-import { Minus, Shuffle } from "lucide-react";
 
 function App() {
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [queue, setQueue] = useState(new Queue());
+  const [queue, setQueue] = useState([]);
 
   const [currentSong, setCurrentSong] = useState(null);
 
@@ -38,37 +37,43 @@ function App() {
   }, []);
 
   const handleSongChange = (newSong) => {
+    enqueue(newSong);
     setCurrentSong(newSong);
   };
 
   const handleSongEnded = () => {
-    const nextSong = dequeue();
-    setCurrentSong(nextSong);
+    if (queue.length === 0) {
+      setCurrentSong(null);
+    } else {
+      let nextSong = dequeue();
+      setCurrentSong(nextSong);
+    }
   };
 
   const enqueue = (song) => {
-    const updatedQueue = new Queue(queue.songs);
-    updatedQueue.enqueue(song);
-    setQueue(updatedQueue);
+    setQueue((prevQueue) => [...prevQueue, song]);
   };
 
   const dequeue = () => {
-    const updatedQueue = new Queue(queue.songs);
-    const nextSong = updatedQueue.dequeue();
-    setQueue(updatedQueue);
-    return nextSong;
+    setQueue((prevQueue) => prevQueue.slice(1));
+    return queue(0);
   };
 
   const dequeueIndex = (index) => {
-    const updatedQueue = new Queue(queue.songs);
-    updatedQueue.dequeueIndex(index);
-    setQueue(updatedQueue);
+    setQueue((prevQueue) => prevQueue.filter((_, i) => i !== index));
   };
 
   const shuffleQueue = () => {
-    const updatedQueue = new Queue(queue.songs);
-    updatedQueue.shuffle();
-    setQueue(updatedQueue);
+    setQueue((prevQueue) => [...prevQueue].sort(() => Math.random() - 0.5));
+  };
+
+  const clearQueue = () => {
+    setQueue([]);
+  };
+
+  const playNowFromQueue = (index) => {
+    setQueue((prevQueue) => [...prevQueue].slice(index + 1));
+    setCurrentSong(queue[index]);
   };
 
   if (error) return <div>{error}</div>;
@@ -85,32 +90,57 @@ function App() {
       <div className="queue">
         <div className="header">
           <h2>Songs queue</h2>
-          <button
-            onClick={shuffleQueue}
-            className="suffle-button"
-            disabled={queue.songs.length === 0}
-          >
-            <Shuffle size={24} />
-          </button>
+          <div className="actions-container">
+            <button
+              title="Shuffle queue"
+              onClick={shuffleQueue}
+              className="suffle-button"
+              disabled={queue.length <= 1}
+            >
+              <Shuffle size={24} />
+            </button>
+            <button
+              title="Clear queue"
+              onClick={clearQueue}
+              className="clear-queue-button"
+              disabled={queue.length === 0}
+            >
+              <Trash2 size={24} />
+            </button>
+          </div>
         </div>
-        {queue.isEmpty() ? (
+        <h3>Listening to</h3>
+        <p>{currentSong || "-"}</p>
+        <h3>Next up</h3>
+        {queue.length === 0 ? (
           <i>Queue is empty</i>
         ) : (
-          queue.songs.map((song, index) => (
-            <div key={index} className="song">
-              <span>
-                {song.length > 30
-                  ? song.slice(0, 27) + "..."
-                  : song.replace(".mp3", "")}
-              </span>
-              <button
-                title="Remove from queue"
-                onClick={() => dequeueIndex(index)}
-                className="remove-from-queue-button"
-              >
-                <Minus size={24} />
-              </button>
-            </div>
+          queue.map((song, index) => (
+            <React.Fragment key={index}>
+              <div className="song">
+                <span>
+                  {song.length > 30
+                    ? song.slice(0, 27) + "..."
+                    : song.replace(".mp3", "")}
+                </span>
+                <div className="actions-container">
+                  <button
+                    title="Play now"
+                    onClick={() => playNowFromQueue(index)}
+                    className="play-now-button"
+                  >
+                    <Play size={24} />
+                  </button>
+                  <button
+                    title="Remove from queue"
+                    onClick={() => dequeueIndex(index)}
+                    className="remove-from-queue-button"
+                  >
+                    <Minus size={24} />
+                  </button>
+                </div>
+              </div>
+            </React.Fragment>
           ))
         )}
       </div>

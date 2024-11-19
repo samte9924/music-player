@@ -137,7 +137,11 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
           >
             {isPlaying ? <Pause className="icon" /> : <Play className="icon" />}
           </button>
-          <button disabled={!currentSong} className="skip-forward-button">
+          <button
+            disabled={!currentSong}
+            onClick={handleSongEnded}
+            className="skip-forward-button"
+          >
             <SkipForward className="icon" />
           </button>
         </div>

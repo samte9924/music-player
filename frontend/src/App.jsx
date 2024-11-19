@@ -37,7 +37,6 @@ function App() {
   }, []);
 
   const handleSongChange = (newSong) => {
-    enqueue(newSong);
     setCurrentSong(newSong);
   };
 
@@ -45,7 +44,7 @@ function App() {
     if (queue.length === 0) {
       setCurrentSong(null);
     } else {
-      let nextSong = dequeue();
+      const nextSong = dequeue();
       setCurrentSong(nextSong);
     }
   };
@@ -56,7 +55,7 @@ function App() {
 
   const dequeue = () => {
     setQueue((prevQueue) => prevQueue.slice(1));
-    return queue(0);
+    return queue[0];
   };
 
   const dequeueIndex = (index) => {

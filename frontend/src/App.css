@@ -17,6 +17,10 @@ hr {
   padding: 1rem;
 }
 
+.songs-container h2 {
+  margin-bottom: 1rem;
+}
+
 .song {
   position: relative;
 

@@ -5,6 +5,7 @@ import {
   RotateCw,
   SkipBack,
   SkipForward,
+  Star,
   Volume2,
   VolumeOff,
 } from "lucide-react";
@@ -14,6 +15,7 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
   const [duration, setDuration] = useState("--:--");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
 
   const [sliderMax, setSliderMax] = useState(100);
   const [bufferedAmount, setBufferedAmount] = useState(100);
@@ -66,8 +68,17 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
   };
 
   const restartSong = () => {
-    if (songRef.current) {
+    if (songRef.current && currentSong) {
       songRef.current.currentTime = 0;
+    }
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    if (songRef.current && currentSong) {
+      songRef.current.volume = newVolume;
+      setVolume(newVolume);
+      setIsMuted(newVolume === 0);
     }
   };
 
@@ -79,83 +90,133 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
       if (!isMuted && song.volume > 0) {
         song.volume = 0;
       } else {
-        song.volume = 1;
+        song.volume = volume;
       }
     }
   };
+
+  const handleSkipBack = () => {};
+
+  const handleAddToFavourites = () => {
+    console.log(currentSong);
+  };
+
   return (
     <>
       <div className="playing-song">
         <span className="song-name">
           {currentSong
-            ? `Now playing - ${currentSong.replace(".mp4", "")}`
+            ? `${currentSong.replace(".mp3", "")}`
             : "No song selected"}
         </span>
-        <div className="progress-container">
+        <div className="main-container">
+          <div className="controls-container">
+            <button
+              title="Add to favourites"
+              onClick={handleAddToFavourites}
+              className="add-to-favourites-button"
+              disabled={!currentSong}
+            >
+              <Star size={24} />
+            </button>
+            <button
+              title="Previous"
+              onClick={handleSkipBack}
+              className="skip-back-button"
+              disabled={!currentSong}
+            >
+              <SkipBack className="icon" />
+            </button>
+            <button
+              title={isPlaying ? "Pause" : "Play"}
+              onClick={handlePause}
+              className="pause-button"
+              disabled={!currentSong}
+            >
+              {isPlaying ? (
+                <Pause className="icon" />
+              ) : (
+                <Play className="icon" />
+              )}
+            </button>
+            <button
+              title="Next"
+              onClick={handleSongEnded}
+              className="skip-forward-button"
+              disabled={!currentSong}
+            >
+              <SkipForward className="icon" />
+            </button>
+            <button
+              title="Play again"
+              onClick={restartSong}
+              className="restart-song-button"
+              disabled={!currentSong}
+            >
+              <RotateCw className="icon" />
+            </button>
+          </div>
+          <div className="progress-container">
+            <span className="current-time time">
+              {currentSong ? currentTime : "--:--"}
+            </span>
+            <input
+              type="range"
+              max={sliderMax}
+              value={Math.floor(songRef.current?.currentTime || 0)}
+              onChange={(e) => {
+                if (songRef.current) {
+                  const updatedTime = e.target.value;
+                  songRef.current.currentTime = updatedTime;
+                  setCurrentTime(calculateTime(updatedTime));
+                }
+              }}
+              disabled={!currentSong}
+              className="song-progress"
+            />
+            <span className="duration time">
+              {currentSong ? duration : "--:--"}
+            </span>
+          </div>
+        </div>
+        <div className="volume-container">
           <button
-            onClick={restartSong}
+            title={isMuted ? "Unmute" : "Mute"}
+            onClick={handleMute}
+            className="mute-button"
             disabled={!currentSong}
-            className="restart-song-button"
           >
-            <RotateCw className="icon" />
-          </button>
-          <span className="current-time time">
-            {currentSong ? currentTime : "--:--"}
-          </span>
-          <input
-            type="range"
-            max={sliderMax}
-            value={Math.floor(songRef.current?.currentTime || 0)}
-            onChange={(e) => {
-              const updatedTime = e.target.value;
-              //console.log(updatedTime);
-              songRef.current.currentTime = updatedTime;
-              setCurrentTime(calculateTime(updatedTime));
-            }}
-            disabled={!currentSong}
-            className="song-progress"
-          />
-          <span className="duration time">
-            {currentSong ? duration : "--:--"}
-          </span>
-          <button onClick={handleMute} disabled={!currentSong}>
             {isMuted ? (
               <VolumeOff className="icon" />
             ) : (
               <Volume2 className="icon" />
             )}
           </button>
-        </div>
-        <div className="controls">
-          <button disabled={!currentSong} className="skip-back-button">
-            <SkipBack className="icon" />
-          </button>
-          <button
-            onClick={handlePause}
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={handleVolumeChange}
             disabled={!currentSong}
-            className="pause-button"
-          >
-            {isPlaying ? <Pause className="icon" /> : <Play className="icon" />}
-          </button>
-          <button
-            disabled={!currentSong}
-            onClick={handleSongEnded}
-            className="skip-forward-button"
-          >
-            <SkipForward className="icon" />
-          </button>
+            className="song-volume"
+          />
         </div>
       </div>
-      <audio
-        ref={songRef}
-        src={`http://localhost:3000/songs/${currentSong}`}
-        preload="metadata"
-        onLoadedMetadata={handleMetadataLoaded}
-        onProgress={handleProgress}
-        onTimeUpdate={handleTimeUpdate}
-        onCanPlay={handleCanPlay}
-        onEnded={handleSongEnded}
-      ></audio>
+      {currentSong && (
+        <audio
+          ref={songRef}
+          src={`http://localhost:3000/songs/${currentSong}`}
+          preload="metadata"
+          onLoadedMetadata={handleMetadataLoaded}
+          onProgress={handleProgress}
+          onTimeUpdate={handleTimeUpdate}
+          onCanPlay={handleCanPlay}
+          onEnded={handleSongEnded}
+          onError={(e) => console.error(e)}
+        ></audio>
+      )}
     </>
   );
 }

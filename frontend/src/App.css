@@ -145,18 +145,30 @@ hr {
 /* PLAYING SONG COMPONENT */
 .playing-song {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
 
   position: fixed;
   bottom: 0;
   left: 0;
 
   width: 100%;
+  height: 7rem;
 
-  padding-bottom: 5rem;
-
+  padding: 1rem;
   gap: 0.5rem;
+
+  border: 1px solid black;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 50%;
+
+  gap: 1rem;
 }
 
 .playing-song .icon {
@@ -184,18 +196,23 @@ hr {
   cursor: default;
 }
 
+.song-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
 .progress-container {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 100%;
+  width: 25rem;
 
   gap: 0.5rem;
 }
 
 .song-progress {
-  width: 50%;
+  width: 100%;
 }
 
 .time {
@@ -205,9 +222,16 @@ hr {
   font-weight: 500;
 }
 
-.controls {
+.controls-container {
   display: flex;
   align-items: center;
 
   gap: 1rem;
+}
+
+.volume-container {
+  display: flex;
+  align-items: center;
+
+  gap: 0.5rem;
 }

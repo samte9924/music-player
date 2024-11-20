@@ -12,7 +12,12 @@ import {
   VolumeOff,
 } from "lucide-react";
 
-export default function PlayingSong({ currentSong, handleSongEnded }) {
+export default function PlayingSong({
+  currentSong,
+  setCurrentSong,
+  queue,
+  setQueue,
+}) {
   const [currentTime, setCurrentTime] = useState("--:--");
   const [duration, setDuration] = useState("--:--");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,6 +36,11 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
     const fixedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
 
     return `${minutes}:${fixedSeconds}`;
+  };
+
+  const dequeue = () => {
+    setQueue((prevQueue) => prevQueue.slice(1));
+    return queue[0];
   };
 
   const handleMetadataLoaded = () => {
@@ -56,6 +66,15 @@ export default function PlayingSong({ currentSong, handleSongEnded }) {
       .play()
       .catch((err) => console.error("Playback failed: ", err));
     setIsPlaying(true);
+  };
+
+  const handleSongEnded = () => {
+    if (queue.length === 0) {
+      setCurrentSong(null);
+    } else {
+      const nextSong = dequeue();
+      setCurrentSong(nextSong);
+    }
   };
 
   const handlePause = () => {

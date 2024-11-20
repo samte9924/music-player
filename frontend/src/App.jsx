@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import SongsList from "./components/SongsList";
 import PlayingSong from "./components/PlayingSong";
-import "./App.css";
 import Queue from "./components/Queue";
+import "./App.css";
+import Playlist from "./components/Playlist";
 
 function App() {
+  const [playlists, setPlaylists] = useState(["Playlist 1", "Playlist 2"]);
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,28 +38,6 @@ function App() {
     fetchSongs();
   }, []);
 
-  const handleSongChange = (newSong) => {
-    setCurrentSong(newSong);
-  };
-
-  const handleSongEnded = () => {
-    if (queue.length === 0) {
-      setCurrentSong(null);
-    } else {
-      const nextSong = dequeue();
-      setCurrentSong(nextSong);
-    }
-  };
-
-  const enqueue = (song) => {
-    setQueue((prevQueue) => [...prevQueue, song]);
-  };
-
-  const dequeue = () => {
-    setQueue((prevQueue) => prevQueue.slice(1));
-    return queue[0];
-  };
-
   if (error) return <div>{error}</div>;
   if (isLoading) return <div>Loading</div>;
 
@@ -65,8 +45,8 @@ function App() {
     <>
       <SongsList
         songs={songs}
-        handleSongChange={handleSongChange}
-        enqueue={enqueue}
+        setCurrentSong={setCurrentSong}
+        setQueue={setQueue}
       />
       <hr />
       <Queue
@@ -78,8 +58,17 @@ function App() {
       <hr />
       <PlayingSong
         currentSong={currentSong}
-        handleSongEnded={handleSongEnded}
+        setCurrentSong={setCurrentSong}
+        queue={queue}
+        setQueue={setQueue}
       />
+      <h2>Playlists</h2>
+      <div className="playlists-container">
+        {playlists.map((playlist, index) => (
+          <Playlist key={index} name={playlist} songs={["Song 1", "Song 2"]} />
+        ))}
+      </div>
+      <hr />
     </>
   );
 }

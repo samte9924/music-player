@@ -56,31 +56,29 @@ export default function Queue({
         <i>Queue is empty</i>
       ) : (
         queue.map((song, index) => (
-          <React.Fragment key={index}>
-            <div className="song">
-              <span>
-                {song.length > 30
-                  ? song.slice(0, 27) + "..."
-                  : song.replace(".mp3", "")}
-              </span>
-              <div className="actions-container">
-                <button
-                  title="Play now"
-                  onClick={() => playNowFromQueue(index)}
-                  className="play-now-button"
-                >
-                  <Play size={24} />
-                </button>
-                <button
-                  title="Remove from queue"
-                  onClick={() => dequeueIndex(index)}
-                  className="remove-from-queue-button"
-                >
-                  <Minus size={24} />
-                </button>
-              </div>
+          <div key={index} className="song">
+            <span>
+              {song.length > 30
+                ? song.slice(0, 27) + "..."
+                : song.replace(".mp3", "")}
+            </span>
+            <div className="actions-container">
+              <button
+                title="Play now"
+                onClick={() => playNowFromQueue(index)}
+                className="play-now-button"
+              >
+                <Play size={24} />
+              </button>
+              <button
+                title="Remove from queue"
+                onClick={() => dequeueIndex(index)}
+                className="remove-from-queue-button"
+              >
+                <Minus size={24} />
+              </button>
             </div>
-          </React.Fragment>
+          </div>
         ))
       )}
     </div>

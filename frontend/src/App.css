@@ -243,6 +243,32 @@ hr {
 }
 
 /* PLAYLIST COMPONENT */
+.playlists-header {
+  display: flex;
+  align-items: center;
+
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.playlists-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: none;
+  border: none;
+  outline: none;
+  border-radius: 50%;
+
+  padding: 0.3rem;
+
+  cursor: pointer;
+}
+.playlists-header button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 .playlists-container {
   display: grid;
   grid-template-columns: repeat(3, 12rem);

@@ -4,6 +4,7 @@ import PlayingSong from "./components/PlayingSong";
 import Queue from "./components/Queue";
 import "./App.css";
 import Playlist from "./components/Playlist";
+import { Plus } from "lucide-react";
 
 function App() {
   const [playlists, setPlaylists] = useState(["Playlist 1", "Playlist 2"]);
@@ -62,7 +63,12 @@ function App() {
         queue={queue}
         setQueue={setQueue}
       />
-      <h2>Playlists</h2>
+      <div className="playlists-header">
+        <h2>Playlists</h2>
+        <button>
+          <Plus size={24} />
+        </button>
+      </div>
       <div className="playlists-container">
         {playlists.map((playlist, index) => (
           <Playlist key={index} name={playlist} songs={["Song 1", "Song 2"]} />
